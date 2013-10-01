@@ -6,19 +6,28 @@ using System.Text;
 
 namespace DefineColors.Methods
 {
-	public class MethodAllLinks : IMethod
+	public class MethodAllLinks : IMethodLink
 	{
 		public override string MethodName()
 		{
 			return "Метод полных связей";
 		}
 
-		public override void FindColors(Bitmap bitmap)
+		/// <summary>
+		/// Добавлять ли указанный цвет в кластер
+		/// </summary>
+		protected override bool AddPredicate(Color color, List<Color> cluster)
 		{
-			base.FindColors(bitmap);
+			//Цвет добавляется, если в кластере все цвета достаточно близки к данному
+			double d = 0;
+			int i = 0;
+			do
+			{
+				d = ColorDistance(color, cluster[i]);
+				i++;
+			} while (d <= _eps && i < cluster.Count());
 
-
-			GetColorsFromClusters();
+			return d <= _eps;
 		}
 	}
 }

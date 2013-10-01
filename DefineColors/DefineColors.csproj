@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Methods\IMethod.cs" />
+    <Compile Include="Methods\IMethodLink.cs" />
     <Compile Include="Methods\MethodAllLinks.cs" />
     <Compile Include="Methods\MethodMeanLink.cs" />
     <Compile Include="Methods\MethodOneLink.cs" />

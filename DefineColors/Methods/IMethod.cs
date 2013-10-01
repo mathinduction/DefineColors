@@ -13,9 +13,13 @@ namespace DefineColors.Methods
 
 		protected List<Color> _pixels = new List<Color>();
 		protected List<List<Color>> _clusters = new List<List<Color>>(); 
-		protected List<Color> _colors = new List<Color>(); 
+		protected List<Color> _colors = new List<Color>();
 
-		public abstract string MethodName();
+		public virtual string MethodName()
+		{
+			return "";
+		}
+
 		public virtual void FindColors(Bitmap bitmap)
 		{
 			_colors = new List<Color>();

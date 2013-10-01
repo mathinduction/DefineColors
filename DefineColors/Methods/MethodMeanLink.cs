@@ -6,19 +6,27 @@ using System.Text;
 
 namespace DefineColors.Methods
 {
-	public class MethodMeanLink : IMethod
+	public class MethodMeanLink : IMethodLink
 	{
 		public override string MethodName()
 		{
 			return "Метод средней связи";
 		}
 
-		public override void FindColors(Bitmap bitmap)
+		/// <summary>
+		/// Добавлять ли указанный цвет в кластер
+		/// </summary>
+		protected override bool AddPredicate(Color color, List<Color> cluster)
 		{
-			base.FindColors(bitmap);
+			//Цвет добавляется, если цвета в кластере в среднем достаточно близки к данному
+			double d = 0;
+			foreach (Color c in cluster)
+			{
+				d += ColorDistance(color, c);
+			}
+			d /= cluster.Count();
 
-
-			GetColorsFromClusters();
+			return d <= _eps;
 		}
 	}
 }
