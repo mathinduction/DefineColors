@@ -9,7 +9,7 @@
 			<ColumnDefinition Width="160"/>
 		</Grid.ColumnDefinitions>
 
-		<Image Grid.Column="0" Name="imageSourse" Margin="5" Source="D:\img.bmp"></Image>
+		<Image Grid.Column="0" Name="imageSourse" Margin="5"></Image>
 		<Canvas Grid.Column="1" Name="canvasColors" Margin="5"/>
 
 		<Grid Grid.Column="2" Margin="5">

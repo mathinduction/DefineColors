@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -13,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using DefineColors.Methods;
 using System.Drawing;		//TODO а нужен ли вообще?
+using Microsoft.Win32;
 using Color = System.Drawing.Color;
 using Rectangle = System.Windows.Shapes.Rectangle;
 
@@ -88,6 +90,24 @@ namespace DefineColors
 		private void buttonOpenFile_Click(object sender, RoutedEventArgs e)
 		{
 			//TODO
+
+			OpenFileDialog dlg = new OpenFileDialog();
+
+			dlg.InitialDirectory = "D:\\";
+			dlg.Filter = "All files (*.*)|*.*|PNG Photos (*.png)|*.png";
+			dlg.FilterIndex = 2;
+			dlg.RestoreDirectory = true;
+
+			// Show open file dialog box
+			Nullable<bool> result = dlg.ShowDialog();
+
+			// Process open file dialog box results
+			if (result == true)
+			{
+				// Open document
+				_file = dlg.FileName;
+			}
+
 			PrepareImage(_file);
 		}
 
@@ -96,8 +116,13 @@ namespace DefineColors
 		/// </summary>
 		private void PrepareImage(string file)
 		{
+			BitmapImage bi = new BitmapImage();
+			bi.BeginInit();
+			bi.UriSource = new Uri(_file);
+			bi.EndInit();
+			imageSourse.Source = bi;
+
 			_sourseBitmap = new Bitmap(file);
-			//var c = _sourseBitmap.GetPixel(0,0);
 		}
 	}
 }
