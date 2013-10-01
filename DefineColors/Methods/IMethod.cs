@@ -8,6 +8,9 @@ namespace DefineColors.Methods
 {
 	public abstract class IMethod
 	{
+		private const double _norm = 441.672955930063709849498817084;//=Math.Sqrt(195075)=Math.Sqrt(255*255 + 255*255 + 255*255); - максимально возможное расстояние
+		protected double _eps = _norm * 0.5;
+
 		protected List<Color> _pixels = new List<Color>();
 		protected List<List<Color>> _clusters = new List<List<Color>>(); 
 		protected List<Color> _colors = new List<Color>(); 
@@ -15,6 +18,8 @@ namespace DefineColors.Methods
 		public abstract string MethodName();
 		public virtual void FindColors(Bitmap bitmap)
 		{
+			_colors = new List<Color>();
+			_clusters = new List<List<Color>>();
 			_pixels = BitmapToList(bitmap);
 		}
 
@@ -26,6 +31,11 @@ namespace DefineColors.Methods
 		public List<Color> GetColors()
 		{
 			return _colors;
+		}
+
+		public void SetEps(double eps)
+		{
+			_eps = eps*_norm;
 		}
 
 		/// <summary>

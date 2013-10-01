@@ -8,8 +8,6 @@ namespace DefineColors.Methods
 {
 	public class MethodOneLink : IMethod
 	{
-		private double _eps = 100;//TODO задание из интерфейса + нормировку на sqrt(195075) = sqrt(255*255 + 255*255 + 255*255)
-
 		public override string MethodName()
 		{
 			return "Метод одиночной связи";

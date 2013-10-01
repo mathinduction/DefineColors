@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using DefineColors.Methods;
-using System.Drawing;
+using System.Drawing;		//TODO а нужен ли вообще?
 using Color = System.Drawing.Color;
 using Rectangle = System.Windows.Shapes.Rectangle;
 
@@ -52,6 +52,7 @@ namespace DefineColors
 		private void buttonStart_Click(object sender, RoutedEventArgs e)
 		{
 			IMethod method = _methods[comboBoxMethod.SelectedIndex];
+			method.SetEps(sliderEps.Value);
 			method.FindColors(_sourseBitmap);
 			var colors = method.GetColors();
 
