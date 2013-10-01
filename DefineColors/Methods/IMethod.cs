@@ -11,8 +11,8 @@ namespace DefineColors.Methods
 		private const double _norm = 441.672955930063709849498817084;//=Math.Sqrt(195075)=Math.Sqrt(255*255 + 255*255 + 255*255); - максимально возможное расстояние
 		protected double _eps = _norm * 0.5;
 
-		protected List<Color> _pixels = new List<Color>();
-		protected List<List<Color>> _clusters = new List<List<Color>>(); 
+		protected List<Tuple<Color, int>> _pixels = new List<Tuple<Color, int>>();
+		protected List<List<Tuple<Color, int>>> _clusters = new List<List<Tuple<Color, int>>>(); 
 		protected List<Color> _colors = new List<Color>();
 
 		public virtual string MethodName()
@@ -23,11 +23,11 @@ namespace DefineColors.Methods
 		public virtual void FindColors(Bitmap bitmap)
 		{
 			_colors = new List<Color>();
-			_clusters = new List<List<Color>>();
+			_clusters = new List<List<Tuple<Color, int>>>();
 			_pixels = BitmapToList(bitmap);
 		}
 
-		public List<List<Color>> GetClusters()
+		public List<List<Tuple<Color, int>>> GetClusters()
 		{
 			return _clusters;
 		}
@@ -61,16 +61,17 @@ namespace DefineColors.Methods
 		protected void GetColorsFromClusters()
 		{
 			_colors = new List<Color>();
-			foreach (List<Color> cluster in _clusters)
+			foreach (List<Tuple<Color, int>> cluster in _clusters)
 			{
 				double r = 0, b = 0, g = 0;
-				foreach (Color color in cluster)//TODO возможо переволнение!!
+				int size = 0;
+				foreach (Tuple<Color, int> color in cluster)//TODO возможо переволнение!!
 				{
-					r += color.R;
-					g += color.G;
-					b += color.B;
+					r += color.Item1.R * color.Item2;//TODO проверить как теперь работает
+					g += color.Item1.G * color.Item2;
+					b += color.Item1.B * color.Item2;
+					size += color.Item2;
 				}
-				int size = cluster.Count();
 				r /= size;
 				g /= size;
 				b /= size;
@@ -78,7 +79,7 @@ namespace DefineColors.Methods
 			}
 		}
 
-		private List<Color> BitmapToList(Bitmap bitmap)
+		private List<Tuple<Color, int>> BitmapToList(Bitmap bitmap)
 		{
 			if (bitmap == null)
 				return null;
@@ -86,10 +87,20 @@ namespace DefineColors.Methods
 			for (int i = 0; i < bitmap.Width; i++)
 				for (int j = 0; j < bitmap.Height; j++)
 				{
-					_pixels.Add(bitmap.GetPixel(i,j));
+					Color color = bitmap.GetPixel(i, j);
+					int num = _pixels.FindIndex(x => x.Item1.R == color.R && x.Item1.G == color.G && x.Item1.B == color.B);
+					if (num >= 0)//Такой цвет уже есть
+					{
+						int oldCount = _pixels[num].Item2;
+						_pixels[num] = new Tuple<Color, int>(color, oldCount + 1);
+					}
+					else
+					{
+						_pixels.Add(new Tuple<Color, int>(color, 1));
+					}
 				}
 
-			return _pixels;//TODO убрать повторы
+			return _pixels;
 		}
 	}
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using DefineColors.Methods;
 using System.Drawing;		//TODO а нужен ли вообще?
 using Microsoft.Win32;
@@ -61,8 +63,8 @@ namespace DefineColors
 
 			#region Рисуем на Canvas найденные цвета
 
-			double h = canvasColors.ActualHeight;//Высота
-			double w = canvasColors.ActualWidth;//Ширина
+			double h = canvasMediumColors.ActualHeight;//Высота
+			double w = canvasMediumColors.ActualWidth;//Ширина
 
 			double oneColorH = h/colors.Count();//Высота для одного цвета
 
@@ -80,7 +82,7 @@ namespace DefineColors
 				Canvas.SetTop(rect, count*oneColorH);
 				Canvas.SetLeft(rect, 0);
 
-				canvasColors.Children.Add(rect);
+				canvasMediumColors.Children.Add(rect);
 				count++;
 			}
 
@@ -89,8 +91,6 @@ namespace DefineColors
 
 		private void buttonOpenFile_Click(object sender, RoutedEventArgs e)
 		{
-			//TODO
-
 			OpenFileDialog dlg = new OpenFileDialog();
 
 			dlg.InitialDirectory = "D:\\";

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Windows.Threading;
 
 namespace DefineColors.Methods
 {
@@ -15,13 +17,13 @@ namespace DefineColors.Methods
 		{
 			base.FindColors(bitmap);
 
-			List<Color> cluster = new List<Color>();
+			List<Tuple<Color, int>> cluster = new List<Tuple<Color, int>>();
 
 			while (_pixels.Count() != 0)
 			{
 				int i = 0;
 				int newColorsInCluster = 0;
-				cluster = new List<Color>();
+				cluster = new List<Tuple<Color, int>>();
 				cluster.Add(_pixels[0]);
 				_pixels.RemoveAt(0);
 				int size = _pixels.Count();
@@ -55,6 +57,6 @@ namespace DefineColors.Methods
 		/// <summary>
 		/// Добавлять ли указанный цвет в кластер
 		/// </summary>
-		protected abstract bool AddPredicate(Color color, List<Color> cluster);
+		protected abstract bool AddPredicate(Tuple<Color, int> color, List<Tuple<Color, int>> cluster);
 	}
 }

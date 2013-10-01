@@ -16,13 +16,13 @@ namespace DefineColors.Methods
 		/// <summary>
 		/// Добавлять ли указанный цвет в кластер
 		/// </summary>
-		protected override bool AddPredicate(Color color, List<Color> cluster)
+		protected override bool AddPredicate(Tuple<Color, int> color, List<Tuple<Color, int>> cluster)
 		{
 			//Цвет добавляется, если цвета в кластере в среднем достаточно близки к данному
 			double d = 0;
-			foreach (Color c in cluster)
+			foreach (Tuple<Color, int> c in cluster)
 			{
-				d += ColorDistance(color, c);
+				d += ColorDistance(color.Item1, c.Item1);
 			}
 			d /= cluster.Count();
 
