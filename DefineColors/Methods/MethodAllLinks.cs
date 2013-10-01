@@ -13,10 +13,12 @@ namespace DefineColors.Methods
 			return "Метод полных связей";
 		}
 
-		public override List<Color> FindColors(Bitmap bitmap)
+		public override void FindColors(Bitmap bitmap)
 		{
-			List<Color> colors = new List<Color>();
-			return colors;
+			base.FindColors(bitmap);
+
+
+			GetColorsFromClusters();
 		}
 	}
 }

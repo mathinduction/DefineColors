@@ -13,6 +13,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using DefineColors.Methods;
 using System.Drawing;
+using Color = System.Drawing.Color;
+using Rectangle = System.Windows.Shapes.Rectangle;
 
 namespace DefineColors
 {
@@ -50,7 +52,35 @@ namespace DefineColors
 		private void buttonStart_Click(object sender, RoutedEventArgs e)
 		{
 			IMethod method = _methods[comboBoxMethod.SelectedIndex];
-			var colors = method.FindColors(_sourseBitmap);
+			method.FindColors(_sourseBitmap);
+			var colors = method.GetColors();
+
+			#region Рисуем на Canvas найденные цвета
+
+			double h = canvasColors.ActualHeight;//Высота
+			double w = canvasColors.ActualWidth;//Ширина
+
+			double oneColorH = h/colors.Count();//Высота для одного цвета
+
+			int count = 0;
+			foreach (Color color in colors)
+			{
+				System.Windows.Shapes.Rectangle rect = new Rectangle();
+				rect.Height = oneColorH;
+				rect.Width = w;
+
+				SolidColorBrush brush = new SolidColorBrush();
+				brush.Color = System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
+				rect.Fill = brush;
+
+				Canvas.SetTop(rect, count*oneColorH);
+				Canvas.SetLeft(rect, 0);
+
+				canvasColors.Children.Add(rect);
+				count++;
+			}
+
+			#endregion
 		}
 
 		private void buttonOpenFile_Click(object sender, RoutedEventArgs e)

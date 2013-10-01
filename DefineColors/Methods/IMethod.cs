@@ -10,12 +10,22 @@ namespace DefineColors.Methods
 	{
 		protected List<Color> _pixels = new List<Color>();
 		protected List<List<Color>> _clusters = new List<List<Color>>(); 
+		protected List<Color> _colors = new List<Color>(); 
 
 		public abstract string MethodName();
-		public virtual List<Color> FindColors(Bitmap bitmap)
+		public virtual void FindColors(Bitmap bitmap)
 		{
 			_pixels = BitmapToList(bitmap);
-			return null;
+		}
+
+		public List<List<Color>> GetClusters()
+		{
+			return _clusters;
+		}
+
+		public List<Color> GetColors()
+		{
+			return _colors;
 		}
 
 		/// <summary>
@@ -29,6 +39,29 @@ namespace DefineColors.Methods
 				          (color1.B - color2.B)*(color1.B - color2.B));
 
 			return rez;
+		}
+
+		/// <summary>
+		/// Вычисляет средний цвет по каждому кластеру
+		/// </summary>
+		protected void GetColorsFromClusters()
+		{
+			_colors = new List<Color>();
+			foreach (List<Color> cluster in _clusters)
+			{
+				double r = 0, b = 0, g = 0;
+				foreach (Color color in cluster)//TODO возможо переволнение!!
+				{
+					r += color.R;
+					g += color.G;
+					b += color.B;
+				}
+				int size = cluster.Count();
+				r /= size;
+				g /= size;
+				b /= size;
+				_colors.Add(Color.FromArgb(255, (int)r, (int)g, (int)b));
+			}
 		}
 
 		private List<Color> BitmapToList(Bitmap bitmap)

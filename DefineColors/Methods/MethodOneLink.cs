@@ -15,11 +15,10 @@ namespace DefineColors.Methods
 			return "Метод одиночной связи";
 		}
 
-		public override List<Color> FindColors(Bitmap bitmap)
+		public override void FindColors(Bitmap bitmap)
 		{
 			base.FindColors(bitmap);
 	
-			List<Color> colors = new List<Color>();
 			List<Color> cluster = new List<Color>();
 
 			while (_pixels.Count() != 0)
@@ -54,7 +53,7 @@ namespace DefineColors.Methods
 				#endregion
 			}
 			
-			return colors;
+			GetColorsFromClusters();
 		}
 
 		/// <summary>
