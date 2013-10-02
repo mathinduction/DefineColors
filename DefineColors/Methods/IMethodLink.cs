@@ -19,7 +19,7 @@ namespace DefineColors.Methods
 
 			List<Tuple<Color, int>> cluster = new List<Tuple<Color, int>>();
 
-			while (_pixels.Count() != 0)
+			while (_pixels.Count() > 0)
 			{
 				int i = 0;
 				int newColorsInCluster = 0;

@@ -75,6 +75,7 @@
     <Compile Include="Methods\MethodAllLinks.cs" />
     <Compile Include="Methods\MethodMeanLink.cs" />
     <Compile Include="Methods\MethodOneLink.cs" />
+    <Compile Include="Methods\MethodSearchCondensations.cs" />
     <Compile Include="Methods\MethodWard .cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

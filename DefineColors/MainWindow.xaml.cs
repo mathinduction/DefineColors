@@ -41,6 +41,7 @@ namespace DefineColors
 			_methods.Add(new MethodAllLinks());
 			_methods.Add(new MethodMeanLink());
 			_methods.Add(new MethodWard());
+			_methods.Add(new MethodSearchCondensations());
 
 			foreach (var m in _methods)
 			{
