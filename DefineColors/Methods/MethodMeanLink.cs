@@ -13,12 +13,8 @@ namespace DefineColors.Methods
 			return "Метод средней связи";
 		}
 
-		/// <summary>
-		/// Добавлять ли указанный цвет в кластер
-		/// </summary>
-		protected override bool AddPredicate(Tuple<Color, int> color, List<Tuple<Color, int>> cluster)
+		protected override double ColorClusterDintance(Tuple<Color, int> color, List<Tuple<Color, int>> cluster)
 		{
-			//Цвет добавляется, если цвета в кластере в среднем достаточно близки к данному
 			double d = 0;
 			foreach (Tuple<Color, int> c in cluster)
 			{
@@ -26,7 +22,7 @@ namespace DefineColors.Methods
 			}
 			d /= cluster.Count();
 
-			return d <= _eps;
+			return d;
 		}
 	}
 }

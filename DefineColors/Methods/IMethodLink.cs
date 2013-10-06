@@ -13,7 +13,7 @@ namespace DefineColors.Methods
 		/// <summary>
 		/// Поиск цветов
 		/// </summary>
-		public override void FindColors(Bitmap bitmap)
+		public override void FindColors(Bitmap bitmap)//TODO исправить алгоритм
 		{
 			base.FindColors(bitmap);
 
@@ -27,6 +27,7 @@ namespace DefineColors.Methods
 				cluster.Add(_pixels[0]);
 				_pixels.RemoveAt(0);
 				int size = _pixels.Count();
+
 				#region //Повторять до тех пор, пока есть цвета, достаточно близкие хотя бы к одному цвету в кластере
 				do
 				{
@@ -54,9 +55,14 @@ namespace DefineColors.Methods
 			GetColorsFromClusters();
 		}
 
+		private bool AddPredicate(Tuple<Color, int> color, List<Tuple<Color, int>> cluster)
+		{
+			return true;//TODO
+		}
+
 		/// <summary>
-		/// Добавлять ли указанный цвет в кластер
+		/// Вычисляет расстояние между заданныи цветом и кластером
 		/// </summary>
-		protected abstract bool AddPredicate(Tuple<Color, int> color, List<Tuple<Color, int>> cluster);
+		protected abstract double ColorClusterDintance(Tuple<Color, int> color, List<Tuple<Color, int>> cluster);
 	}
 }

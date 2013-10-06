@@ -13,21 +13,17 @@ namespace DefineColors.Methods
 			return "Метод одиночной связи";
 		}
 
-		/// <summary>
-		/// Добавлять ли указанный цвет в кластер
-		/// </summary>
-		protected override bool AddPredicate(Tuple<Color, int> color, List<Tuple<Color, int>> cluster)
+		protected override double ColorClusterDintance(Tuple<Color, int> color, List<Tuple<Color, int>> cluster)
 		{
-			//Цвет добавляется, если в кластере есть хотябы один цвет достаточно близкий к данному
-			double d = _eps + 1;
-			int i = -1;
-			while (d > _eps && i < cluster.Count() - 1)
+			double minD = ColorDistance(color.Item1, cluster[0].Item1);
+			foreach (Tuple<Color, int> c in cluster)
 			{
-				i++;
-				d = ColorDistance(color.Item1, cluster[i].Item1);
+				double d = ColorDistance(color.Item1, c.Item1);
+				if (d < minD)
+					minD = d;
 			}
 
-			return d <= _eps;
+			return minD;
 		}
 	}
 }

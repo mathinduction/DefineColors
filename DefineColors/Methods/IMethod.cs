@@ -60,6 +60,7 @@ namespace DefineColors.Methods
 		/// </summary>
 		protected void GetColorsFromClusters()
 		{
+			//TODO брать не средний, а медиану?
 			_colors = new List<Color>();
 			foreach (List<Tuple<Color, int>> cluster in _clusters)
 			{

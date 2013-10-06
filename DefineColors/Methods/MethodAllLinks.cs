@@ -13,21 +13,17 @@ namespace DefineColors.Methods
 			return "Метод полных связей";
 		}
 
-		/// <summary>
-		/// Добавлять ли указанный цвет в кластер
-		/// </summary>
-		protected override bool AddPredicate(Tuple<Color, int> color, List<Tuple<Color, int>> cluster)
+		protected override double ColorClusterDintance(Tuple<Color, int> color, List<Tuple<Color, int>> cluster)
 		{
-			//Цвет добавляется, если в кластере все цвета достаточно близки к данному
-			double d = 0;
-			int i = 0;
-			do
+			double maxD = ColorDistance(color.Item1, cluster[0].Item1);
+			foreach (Tuple<Color, int> c in cluster)
 			{
-				d = ColorDistance(color.Item1, cluster[i].Item1);
-				i++;
-			} while (d <= _eps && i < cluster.Count());
+				double d = ColorDistance(color.Item1, c.Item1);
+				if (d > maxD)
+					maxD = d;
+			}
 
-			return d <= _eps;
+			return maxD;
 		}
 	}
 }
