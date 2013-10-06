@@ -8,12 +8,11 @@ namespace DefineColors.Methods
 {
 	public abstract class IMethod
 	{
-		private const double _norm = 441.672955930063709849498817084;//=Math.Sqrt(195075)=Math.Sqrt(255*255 + 255*255 + 255*255); - максимально возможное расстояние
-		protected double _eps = _norm * 0.5;
-
 		protected List<Tuple<Color, int>> _pixels = new List<Tuple<Color, int>>();
 		protected List<List<Tuple<Color, int>>> _clusters = new List<List<Tuple<Color, int>>>(); 
 		protected List<Color> _colors = new List<Color>();
+		protected double _eps = 0;
+		private const double _eps_same = 30;
 
 		public virtual string MethodName()
 		{
@@ -37,10 +36,10 @@ namespace DefineColors.Methods
 			return _colors;
 		}
 
-		public void SetEps(double eps)
-		{
-			_eps = eps*_norm;
-		}
+		/// <summary>
+		/// Нормировка Eps
+		/// </summary>
+		public abstract void SetEps(double eps);
 
 		/// <summary>
 		/// "Расстояние" между цветами
@@ -89,7 +88,10 @@ namespace DefineColors.Methods
 				for (int j = 0; j < bitmap.Height; j++)
 				{
 					Color color = bitmap.GetPixel(i, j);
-					int num = _pixels.FindIndex(x => x.Item1.R == color.R && x.Item1.G == color.G && x.Item1.B == color.B);
+					//int num = _pixels.FindIndex(x => x.Item1.R == color.R && x.Item1.G == color.G && x.Item1.B == color.B);
+					int num = _pixels.FindIndex(x => ((x.Item1.R - color.R) * (x.Item1.R - color.R) + 
+						(x.Item1.G - color.G) * (x.Item1.G - color.G) + 
+						(x.Item1.B - color.B) * (x.Item1.B - color.B)) < _eps_same);
 					if (num >= 0)//Такой цвет уже есть
 					{
 						int oldCount = _pixels[num].Item2;
