@@ -13,56 +13,98 @@ namespace DefineColors.Methods
 		/// <summary>
 		/// Поиск цветов
 		/// </summary>
-		public override void FindColors(Bitmap bitmap)//TODO исправить алгоритм
+		public override void FindColors(Bitmap bitmap)
 		{
 			base.FindColors(bitmap);
 
-			List<Tuple<Color, int>> cluster = new List<Tuple<Color, int>>();
+			#region Вначале каждый элемент - кластер
 
-			while (_pixels.Count() > 0)
+			foreach (Tuple<Color, int> pixel in _pixels)
 			{
-				int i = 0;
-				int newColorsInCluster = 0;
-				cluster = new List<Tuple<Color, int>>();
-				cluster.Add(_pixels[0]);
-				_pixels.RemoveAt(0);
-				int size = _pixels.Count();
+				List<Tuple<Color, int>> cluster = new List<Tuple<Color, int>>();
+				cluster.Add(pixel);
+				_clusters.Add(cluster);
+			}
+			_pixels = new List<Tuple<Color, int>>();
 
-				#region //Повторять до тех пор, пока есть цвета, достаточно близкие хотя бы к одному цвету в кластере
+			#endregion
+
+			string msg = "stop";
+
+			int size;
+			try
+			{
+				#region Продолжать до тех пор, пока кластеров больше, чем необходимо
 				do
 				{
-					newColorsInCluster = 0;
-					while (i < size)//До тех пор пока есть непросмотренные цвета
+					size = _clusters.Count;
+
+					#region Ищем самыe близкие друг к другу кластеры
+
+					int count = _clusters.Count(), i = 0;
+					while (i < count)
 					{
-						if (AddPredicate(_pixels[i], cluster))//Добавляем цвет
+						var cluster = _clusters[i];
+						_clusters.RemoveAt(i);
+
+						List<Tuple<Color, int>> newCluster = new List<Tuple<Color, int>>();
+						double currentV = ColorClusterDintance(cluster);
+						double minV = int.MaxValue;
+						List<Tuple<Color, int>> minCluster = new List<Tuple<Color, int>>();
+						foreach (List<Tuple<Color, int>> c in _clusters)//Ищем самый близкий к данному кластер
 						{
-							cluster.Add(_pixels[i]);
-							_pixels.RemoveAt(i);
-							size--;
-							newColorsInCluster++;
+							newCluster = cluster.Concat(c).ToList();
+							double newV = ColorClusterDintance(newCluster);
+							if (newV < minV)
+							{
+								minV = newV;
+								minCluster = c;
+							}
+						}
+
+						//Выясняем, является ли данный кластер самый близкий к найденному и если да, то объединяем их
+						_clusters.Remove(minCluster);
+						int j = 0;
+						double v = int.MaxValue;
+						while (j < _clusters.Count() && minV < v)
+						{
+							newCluster = minCluster.Concat(_clusters[j]).ToList();
+							v = ColorClusterDintance(newCluster);
+							j++;
+						}
+
+						if (minV < v)//Если просмотрели все кластеры и не нашли ничего ближе
+						{
+							_clusters.Add(cluster.Concat(minCluster).ToList());
+							if (_clusters.Count() == _numberColors)//Если нашли необходимое число кластеров
+								throw new Exception(msg);
 						}
 						else
 						{
+							_clusters.Add(minCluster);
+							_clusters.Insert(i, cluster);
 							i++;
+							count = _clusters.Count();
+							continue;
 						}
+						count = _clusters.Count();
 					}
 
-				} while (newColorsInCluster > 0);
-				_clusters.Add(cluster);
+					#endregion
+
+				} while ((size - _clusters.Count()) > 0);
 				#endregion
 			}
-
-			GetColorsFromClusters();
-		}
-
-		private bool AddPredicate(Tuple<Color, int> color, List<Tuple<Color, int>> cluster)
-		{
-			return true;//TODO
+			catch (Exception e)
+			{
+				if (e.Message == msg)//Если нашли достаточное число цветов
+					GetColorsFromClusters();
+			}
 		}
 
 		/// <summary>
-		/// Вычисляет расстояние между заданныи цветом и кластером
+		/// Вычисляет расстояние между элементами кластера
 		/// </summary>
-		protected abstract double ColorClusterDintance(Tuple<Color, int> color, List<Tuple<Color, int>> cluster);
+		protected abstract double ColorClusterDintance(List<Tuple<Color, int>> cluster);
 	}
 }

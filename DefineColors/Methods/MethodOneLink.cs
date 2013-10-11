@@ -13,14 +13,18 @@ namespace DefineColors.Methods
 			return "Метод одиночной связи";
 		}
 
-		protected override double ColorClusterDintance(Tuple<Color, int> color, List<Tuple<Color, int>> cluster)
+		protected override double ColorClusterDintance(List<Tuple<Color, int>> cluster)
 		{
-			double minD = ColorDistance(color.Item1, cluster[0].Item1);
-			foreach (Tuple<Color, int> c in cluster)
+			double minD = double.MaxValue;
+			for (int i = 0; i < cluster.Count; i++)
 			{
-				double d = ColorDistance(color.Item1, c.Item1);
-				if (d < minD)
-					minD = d;
+				Tuple<Color, int> c = cluster[i];
+				for (int j = i + 1; j < cluster.Count; j++)
+				{
+					double d = ColorDistance(cluster[j].Item1, c.Item1);
+					if (d < minD)
+						minD = d;
+				}
 			}
 
 			return minD;
