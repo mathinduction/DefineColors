@@ -11,8 +11,11 @@ namespace DefineColors.Methods
 		protected List<Tuple<Color, int>> _pixels = new List<Tuple<Color, int>>();
 		protected List<List<Tuple<Color, int>>> _clusters = new List<List<Tuple<Color, int>>>(); 
 		protected List<Color> _colors = new List<Color>();
-		protected double _eps = 0;
-		private const double _eps_same = 30;
+		private const double _eps_same = 40;
+
+		protected int _numberColors = 4;
+		protected const double _norm = 441.672955930063709849498817084;//=Math.Sqrt(195075)=Math.Sqrt(255*255 + 255*255 + 255*255); - максимально возможное расстояние
+		protected double _eps = 0.5*_norm;
 
 		public virtual string MethodName()
 		{
@@ -37,9 +40,17 @@ namespace DefineColors.Methods
 		}
 
 		/// <summary>
-		/// Нормировка Eps
+		/// Задание числа цветов
 		/// </summary>
-		public abstract void SetEps(double eps);
+		public void SetNumberColors(int n)
+		{
+			_numberColors = n;
+		}
+
+		public void SetEps(double eps)
+		{
+			_eps = eps*_norm;
+		}
 
 		/// <summary>
 		/// "Расстояние" между цветами

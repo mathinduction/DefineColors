@@ -8,13 +8,6 @@ namespace DefineColors.Methods
 {
 	class MethodWard : IMethod
 	{
-		private const double _norm = 4e5;//TODO подобрать нормальное значение для нормировки
-
-		public override void SetEps(double eps)
-		{
-			_eps = eps * _norm;
-		}
-
 		public override string MethodName()
 		{
 			return "Метод Уорда";
@@ -23,7 +16,7 @@ namespace DefineColors.Methods
 		/// <summary>
 		/// Поиск цветов
 		/// </summary>
-		public override void FindColors(Bitmap bitmap)//TODO сделать другую нормировку Eps?
+		public override void FindColors(Bitmap bitmap)
 		{
 			base.FindColors(bitmap);
 
@@ -39,76 +32,77 @@ namespace DefineColors.Methods
 
 			#endregion
 
-			#region Продолжать до тех пор, пока есть достаточно близкие кластеры
+			string msg = "stop";
 
 			int size;
-			do
+			try
 			{
-				size = _clusters.Count;
-
-				#region Ищем самыe близкие друг к другу кластеры
-
-				int count = _clusters.Count(), i = 0;
-				while (i < count)
+				#region Продолжать до тех пор, пока кластеров больше, чем необходимо
+				do
 				{
-					var cluster = _clusters[i];
-					_clusters.RemoveAt(i);
+					size = _clusters.Count;
 
-					List<Tuple<Color, int>> newCluster = new List<Tuple<Color, int>>();
-					double currentV = V(cluster);
-					double minV = int.MaxValue;
-					List<Tuple<Color, int>> minCluster = new List<Tuple<Color, int>>();
-					foreach (List<Tuple<Color, int>> c in _clusters)//Ищем самый близкий к данному кластер
+					#region Ищем самыe близкие друг к другу кластеры
+
+					int count = _clusters.Count(), i = 0;
+					while (i < count)
 					{
-						newCluster = cluster.Concat(c).ToList();
-						double newV = V(newCluster);
-						if (newV < minV)
+						var cluster = _clusters[i];
+						_clusters.RemoveAt(i);
+
+						List<Tuple<Color, int>> newCluster = new List<Tuple<Color, int>>();
+						double currentV = V(cluster);
+						double minV = int.MaxValue;
+						List<Tuple<Color, int>> minCluster = new List<Tuple<Color, int>>();
+						foreach (List<Tuple<Color, int>> c in _clusters)//Ищем самый близкий к данному кластер
 						{
-							minV = newV;
-							minCluster = c;
+							newCluster = cluster.Concat(c).ToList();
+							double newV = V(newCluster);
+							if (newV < minV)
+							{
+								minV = newV;
+								minCluster = c;
+							}
 						}
-					}
 
-					if ((minV - currentV) > _eps)//Если найденный кластер недостаточно близок
-					{
-						_clusters.Insert(i, cluster);
-						i++;
+						//Выясняем, является ли данный кластер самый близкий к найденному и если да, то объединяем их
+						_clusters.Remove(minCluster);
+						int j = 0;
+						double v = int.MaxValue;
+						while (j < _clusters.Count() && minV < v)
+						{
+							newCluster = minCluster.Concat(_clusters[j]).ToList();
+							v = V(newCluster);
+							j++;
+						}
+
+						if (minV < v)//Если просмотрели все кластеры и не нашли ничего ближе
+						{
+							_clusters.Add(cluster.Concat(minCluster).ToList());
+							if (_clusters.Count() == _numberColors)//Если нашли необходимое число кластеров
+								throw new Exception(msg);
+						}
+						else
+						{
+							_clusters.Add(minCluster);
+							_clusters.Insert(i, cluster);
+							i++;
+							count = _clusters.Count();
+							continue;
+						}
 						count = _clusters.Count();
-						continue;
 					}
 
-					//Иначе, выясняем, является ли данный кластер самый близкий к найденному и если да, то объединяем их
-					_clusters.Remove(minCluster);
-					int j = 0;
-					double v = int.MaxValue; 
-					while (j < _clusters.Count() && minV < v)
-					{
-						newCluster = minCluster.Concat(_clusters[j]).ToList();
-						v = V(newCluster);
-						j++;
-					}
+					#endregion
 
-					if (minV < v)//Если просмотрели все кластеры и не нашли ничего ближе
-					{
-						_clusters.Add(cluster.Concat(minCluster).ToList());
-					}
-					else
-					{
-						_clusters.Add(minCluster);
-						_clusters.Insert(i, cluster);
-						i++;
-						count = _clusters.Count();
-						continue;
-					}
-					count = _clusters.Count();
-				}
-				
+				} while ((size - _clusters.Count()) > 0);
 				#endregion
-
-			} while ((size - _clusters.Count()) > 0);
-
-			#endregion
-			GetColorsFromClusters();
+			}
+			catch (Exception e)
+			{
+				if (e.Message == msg)//Если нашли достаточное число цветов
+					GetColorsFromClusters();
+			}
 		}
 
 		/// <summary>

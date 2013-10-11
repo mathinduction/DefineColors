@@ -58,7 +58,20 @@ namespace DefineColors
 		private void buttonStart_Click(object sender, RoutedEventArgs e)
 		{
 			IMethod method = _methods[comboBoxMethod.SelectedIndex];
-			method.SetEps(sliderEps.Value);
+			if (comboBoxMethod.SelectedIndex == _methods.Count() - 1)
+			{
+				method.SetEps(sliderEps.Value);
+			}
+			else
+			{
+				int num = 0;
+				if (!int.TryParse(textBoxNumberColors.Text, out num) || num < 1 || num > 10)
+				{
+					MessageBox.Show("Введено некорректное число цветов! Это должно быть целое число от 1 до 10", "Ошибка!");
+					return;
+				}
+				method.SetNumberColors(num);
+			}
 			method.FindColors(_sourseBitmap);
 			var colors = method.GetColors();
 
@@ -110,6 +123,28 @@ namespace DefineColors
 			}
 
 			PrepareImage(_file);
+		}
+
+		private void comboBoxMethod_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (comboBoxMethod.SelectedIndex == _methods.Count() - 1)
+			{
+				textBlockNumber.Text = "Eps";
+
+				textBoxNumberColors.Visibility = Visibility.Collapsed;
+
+				sliderEps.Visibility = Visibility.Visible;
+				textBlockSliderValue.Visibility = Visibility.Visible;
+			}
+			else
+			{
+				sliderEps.Visibility = Visibility.Collapsed;
+				textBlockSliderValue.Visibility = Visibility.Collapsed;
+
+				textBlockNumber.Text = "Число цветов";
+
+				textBoxNumberColors.Visibility = Visibility.Visible;
+			}
 		}
 
 		/// <summary>

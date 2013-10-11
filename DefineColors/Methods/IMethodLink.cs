@@ -10,12 +10,6 @@ namespace DefineColors.Methods
 {
 	public abstract class IMethodLink : IMethod
 	{
-		private const double _norm = 441.672955930063709849498817084;//=Math.Sqrt(195075)=Math.Sqrt(255*255 + 255*255 + 255*255); - максимально возможное расстояние
-
-		public override void SetEps(double eps)
-		{
-			_eps = eps * _norm;
-		}
 		/// <summary>
 		/// Поиск цветов
 		/// </summary>
