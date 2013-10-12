@@ -29,7 +29,7 @@ namespace DefineColors
 	{
 		private List<IMethod> _methods = new List<IMethod>();
 		private Bitmap _sourseBitmap;
-		private string _file = "D:\\img.bmp";
+		private string _file = "";
 		
 		public MainWindow()
 		{
@@ -51,12 +51,16 @@ namespace DefineColors
 			comboBoxMethod.SelectedIndex = 0;
 
 			#endregion
-
-			PrepareImage(_file);
 		}
 
 		private void buttonStart_Click(object sender, RoutedEventArgs e)
 		{
+			if (_file == "")
+			{
+				MessageBox.Show("Не указан фаил!", "Ошибка!");
+				return;
+			}
+
 			IMethod method = _methods[comboBoxMethod.SelectedIndex];
 			if (comboBoxMethod.SelectedIndex == _methods.Count() - 1)
 			{

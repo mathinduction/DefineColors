@@ -13,19 +13,19 @@ namespace DefineColors.Methods
 			return "Метод средней связи";
 		}
 
-		protected override double ColorClusterDintance(List<Tuple<Color, int>> cluster)
+		protected override double ClusterDintance(List<Tuple<Color, int>> cluster1, List<Tuple<Color, int>> cluster2)
 		{
 			double d = 0;
-			for (int i = 0; i < cluster.Count; i++)
+
+			foreach (Tuple<Color, int> c1 in cluster1)
 			{
-				Tuple<Color, int> c = cluster[i];
-				for (int j = i + 1; j < cluster.Count; j++)
+				foreach (Tuple<Color, int> c2 in cluster2)
 				{
-					d += ColorDistance(cluster[j].Item1, c.Item1);
+					d += ColorDistance(c1.Item1, c2.Item1);
 				}
 			}
 
-			return d/cluster.Count;
+			return d / (cluster1.Count * cluster2.Count);
 		}
 	}
 }

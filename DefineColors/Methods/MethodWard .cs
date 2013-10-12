@@ -16,8 +16,10 @@ namespace DefineColors.Methods
 		/// <summary>
 		/// Расчитывает сумму внутригрупповых квадратов отклонения для кластера
 		/// </summary>
-		protected override double ColorClusterDintance(List<Tuple<Color, int>> cluster)
+		protected override double ClusterDintance(List<Tuple<Color, int>> cluster1, List<Tuple<Color, int>> cluster2)
 		{
+			var cluster = cluster1.Concat(cluster2);
+
 			double r = 0, b = 0, g = 0;
 			int size = 0;
 			foreach (Tuple<Color, int> color in cluster)

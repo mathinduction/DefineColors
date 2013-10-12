@@ -29,82 +29,154 @@ namespace DefineColors.Methods
 
 			#endregion
 
-			string msg = "stop";
-
-			int size;
-			try
+			var Matrix = MakeMatrix(_clusters);
+			while (_clusters.Count > _numberColors)
 			{
-				#region Продолжать до тех пор, пока кластеров больше, чем необходимо
-				do
+				#region До тех пор, пока кластеров больше, чем необходимо
+
+				var coords = FindMin(Matrix);
+				var cluster1 = _clusters[coords.Item1];
+				var cluster2 = _clusters[coords.Item2];
+
+				#region Сдвигаем строки так, что бы строки, соответствующие найденным координатам были последней и предпоследней
+				
+				int last = Matrix.Count - 1;
+				if (coords.Item2 != last)
 				{
-					size = _clusters.Count;
+					SwapRow(Matrix, coords.Item1, last);
+					_clusters[coords.Item1] = _clusters[last];
+					_clusters[last] = cluster1;
 
-					#region Ищем самыe близкие друг к другу кластеры
+					SwapRow(Matrix, coords.Item2, last - 1);
+					_clusters[coords.Item2] = _clusters[last - 1];
+					_clusters[last - 1] = cluster2;
+				}
+				else
+				{
+					SwapRow(Matrix, coords.Item1, last - 1);
+					_clusters[coords.Item1] = _clusters[last - 1];
+					_clusters[last - 1] = cluster1;
+				}
+				#endregion
 
-					int count = _clusters.Count(), i = 0;
-					while (i < count)
-					{
-						var cluster = _clusters[i];
-						_clusters.RemoveAt(i);
+				_clusters.RemoveAt(last);
+				_clusters.RemoveAt(last - 1);
+				Matrix.RemoveAt(last);
+				Matrix.RemoveAt(last - 1);
 
-						List<Tuple<Color, int>> newCluster = new List<Tuple<Color, int>>();
-						double currentV = ColorClusterDintance(cluster);
-						double minV = int.MaxValue;
-						List<Tuple<Color, int>> minCluster = new List<Tuple<Color, int>>();
-						foreach (List<Tuple<Color, int>> c in _clusters)//Ищем самый близкий к данному кластер
-						{
-							newCluster = cluster.Concat(c).ToList();
-							double newV = ColorClusterDintance(newCluster);
-							if (newV < minV)
-							{
-								minV = newV;
-								minCluster = c;
-							}
-						}
+				AddRow(Matrix, cluster1.Concat(cluster2).ToList(), _clusters);
+				_clusters.Add(cluster1.Concat(cluster2).ToList());
 
-						//Выясняем, является ли данный кластер самый близкий к найденному и если да, то объединяем их
-						_clusters.Remove(minCluster);
-						int j = 0;
-						double v = int.MaxValue;
-						while (j < _clusters.Count() && minV < v)
-						{
-							newCluster = minCluster.Concat(_clusters[j]).ToList();
-							v = ColorClusterDintance(newCluster);
-							j++;
-						}
-
-						if (minV < v)//Если просмотрели все кластеры и не нашли ничего ближе
-						{
-							_clusters.Add(cluster.Concat(minCluster).ToList());
-							if (_clusters.Count() == _numberColors)//Если нашли необходимое число кластеров
-								throw new Exception(msg);
-						}
-						else
-						{
-							_clusters.Add(minCluster);
-							_clusters.Insert(i, cluster);
-							i++;
-							count = _clusters.Count();
-							continue;
-						}
-						count = _clusters.Count();
-					}
-
-					#endregion
-
-				} while ((size - _clusters.Count()) > 0);
 				#endregion
 			}
-			catch (Exception e)
+			
+			GetColorsFromClusters();
+		}
+
+#region Работа с матрицей
+
+		/// <summary>
+		/// Создаем матрицу расстояний
+		/// </summary>
+		private List<List<Double>> MakeMatrix(List<List<Tuple<Color, int>>> clusters)
+		{
+			List<List<Double>> Matrix = new List<List<double>>();
+
+			int i = 0;
+			foreach (List<Tuple<Color, int>> cluster in clusters)
 			{
-				if (e.Message == msg)//Если нашли достаточное число цветов
-					GetColorsFromClusters();
+				List<double> row = new List<double>();
+				for (int j = 0; j < i; j++)//Нижний треугольник
+				{
+					double d = ClusterDintance(cluster, clusters[j]);
+					row.Add(d);
+				}
+				Matrix.Add(row);
+				i++;
 			}
+
+			return Matrix;
+		}
+
+		private Tuple<int, int> FindMin (List<List<Double>> Matrix)
+		{
+			int min1 = 0, min2 = 0;
+			double minD = double.MaxValue;
+			int i = 0, j = 0;
+
+			foreach (List<double> row in Matrix)
+			{
+				j = 0;
+				foreach (double d in row)
+				{
+					if (d < minD)
+					{
+						minD = d;
+						min1 = i;
+						min2 = j;
+					}
+					j++;
+				}
+				i++;
+			}
+
+			return new Tuple<int, int>(min1, min2);
 		}
 
 		/// <summary>
-		/// Вычисляет расстояние между элементами кластера
+		/// Добавляет строку в конец матрицы
 		/// </summary>
-		protected abstract double ColorClusterDintance(List<Tuple<Color, int>> cluster);
+		private void AddRow(List<List<Double>> Matrix, List<Tuple<Color, int>> cluster, List<List<Tuple<Color, int>>> clusters)
+		{
+			List<double> row = new List<double>();
+			foreach (List<Tuple<Color, int>> c in clusters)
+			{
+				double d = ClusterDintance(cluster, c);
+				row.Add(d);
+			}
+			Matrix.Add(row);
+		}
+
+		/// <summary>
+		/// Меняет местами строки
+		/// </summary>
+		private void SwapRow(List<List<Double>> Matrix, int index1, int index2)
+		{
+			if (index1 == index2)
+				return; 
+
+			if (index1 > index2)//Упорядочиваем индексы по возрастанию
+			{
+				int ii = index2;
+				index2 = index1;
+				index1 = ii;
+			}
+
+			for (int i = 0; i < index1; i++)
+			{
+				double d = Matrix[index1][i];
+				Matrix[index1][i] = Matrix[index2][i];
+				Matrix[index2][i] = d;
+			}
+			for (int i = index1 + 1; i < index2; i++)
+			{
+				double d = Matrix[i][index1];
+				Matrix[i][index1] = Matrix[index2][i];
+				Matrix[index2][i] = d;
+			}
+			for (int i = index2 + 1; i < Matrix.Count; i++)
+			{
+				double d = Matrix[i][index1];
+				Matrix[i][index1] = Matrix[i][index2];
+				Matrix[i][index2] = d;
+			}
+		}
+
+#endregion
+
+		/// <summary>
+		/// Вычисляет расстояние между двумя кластерами
+		/// </summary>
+		protected abstract double ClusterDintance(List<Tuple<Color, int>> cluster1, List<Tuple<Color, int>> cluster2);
 	}
 }
